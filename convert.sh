@@ -48,9 +48,14 @@ for input_file in "$input"/*.mkv; do
         continue
     fi
     
+    # GPU SPECIFIC!
     # Run the ffmpeg command with GPU acceleration and preset for quality
     # The -preset flag is what you likely want to change for quality, p1-p7. p1 is fast but bulky, p7 is slow but compact
-    if ! ffmpeg -hwaccel_device 0 -hwaccel cuda -i "$input_file" -c:v h264_nvenc -preset p7 -vf "scale=iw:ih" -b:v "${original_bitrate}k" -maxrate "${original_bitrate}k" -bufsize "${bufsize}k" "$output_file"; then
+    if ! ffmpeg -hwaccel_device 0 -hwaccel cuda -i "$input_file" -c:v h264_nvenc -preset p7 -vf "scale=iw:ih" -b:v "${original_bitrate}k" -maxrate "${original_bitrate}k" -bufsize "${bufsize}k" -map 0 "$output_file"; then
+
+    # CPU SPECIFIC
+    # -preset flag: placebo, veryslow, fast, veryfast. Not all of them but you get the point
+    #if ! ffmpeg -i "$input_file" -preset veryfast -vf "scale=iw:ih" -b:v "${original_bitrate}k" -maxrate "${original_bitrate}k" -bufsize "${bufsize}k" -map 0 "$output_file"; then
         echo "Error occurred during conversion of $input_file"
         continue
     fi
